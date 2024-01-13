@@ -22,7 +22,7 @@ namespace dae {
 			std::cout << "DirectX initialization failed!\n";
 		}
 
-		std::vector<Vertex> vertices
+		const std::vector<Vertex> vertices
 		{
 			/*{{ 0.0f, 0.5f, 0.5f}, {1.0f,0.0f,0.0f}},
 			{{ 0.5f,-0.5f, 0.5f}, {0.0f,0.0f,1.0f}},
@@ -36,11 +36,13 @@ namespace dae {
 		const std::vector<uint32_t> indices{ 0,1,2 };
 
 		m_pMesh = new Mesh{m_pDevice,vertices,indices };
-		m_Camera.Initialize(45.f, Vector3{ 0.f,0.f,-10.f });
+		m_Camera.Initialize(45.f, Vector3{ 0.f,0.f,-10.f }, static_cast<float>(m_Width) / static_cast<float>(m_Height));
 	}
 
 	Renderer::~Renderer()
 	{
+		if (m_pMesh) delete m_pMesh;
+
 		if (m_pDeviceContext)
 		{
 			m_pDeviceContext->ClearState();
@@ -57,40 +59,16 @@ namespace dae {
 		if (m_pDepthStencilView) m_pDepthStencilView->Release();
 		if (m_pRenderTargetBuffer) m_pRenderTargetBuffer->Release();
 		if (m_pRenderTargetView) m_pRenderTargetView->Release();
-
-		if(m_pMesh) delete m_pMesh;
 		
 	}
 
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_Camera.Update(pTimer); 
-		const Matrix viewProjMatrix = m_Camera.projectionMatrix * m_Camera.viewMatrix;
-		float* contiguousData = new float[16]; 
+		const Matrix viewProjMatrix = m_Camera.viewMatrix * m_Camera.projectionMatrix;
+		
+		m_pMesh->UpdateWorldViewProjMatrix(&viewProjMatrix.data[0].x);
 
-		contiguousData[0] = viewProjMatrix.GetAxisX().x;
-		contiguousData[1] = viewProjMatrix.GetAxisX().y;
-		contiguousData[2] = viewProjMatrix.GetAxisX().z;
-		contiguousData[3] = 0;
-
-		contiguousData[4] = viewProjMatrix.GetAxisY().x;
-		contiguousData[5] = viewProjMatrix.GetAxisY().y;
-		contiguousData[6] = viewProjMatrix.GetAxisY().z;
-		contiguousData[7] = 0;
-
-		contiguousData[8] = viewProjMatrix.GetAxisZ().x;
-		contiguousData[9] = viewProjMatrix.GetAxisZ().y;
-		contiguousData[10] = viewProjMatrix.GetAxisZ().z;
-		contiguousData[11] = 0;
-
-		contiguousData[12] = viewProjMatrix.GetTranslation().x;
-		contiguousData[13] = viewProjMatrix.GetTranslation().y;
-		contiguousData[14] = viewProjMatrix.GetTranslation().z;
-		contiguousData[15] = 0;
-
-		m_pMesh->UpdateWorldViewProjMatrix(contiguousData);
-
-		delete[] contiguousData;
 	}
 
 
@@ -110,7 +88,6 @@ namespace dae {
 
 		//3. Present backbuffer (SWAP)
 		m_pSwapChain->Present(0, 0);
-
 
 	}
 

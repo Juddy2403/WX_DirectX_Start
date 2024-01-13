@@ -4,7 +4,7 @@
 
 Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) :
 	m_pEffect{ new Effect{pDevice, L"Resources/PosCol3D.fx"} },
-	m_pInputLayout{},
+	m_pInputLayout{nullptr},
 	m_NumIndices{ static_cast<uint32_t>(indices.size()) }
 {
 	// Create vertex layout
@@ -24,8 +24,6 @@ Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std
 	//Create input layout
 	D3DX11_PASS_DESC passDesc{};
 	m_pEffect->GetTechnique()->GetPassByIndex(0)->GetDesc(&passDesc);
-
-	//Create world view projection matrix
 
 	HRESULT result = pDevice->CreateInputLayout(
 		vertexDesc,
@@ -53,7 +51,7 @@ Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std
 	//Create index buffer
 	bd.Usage = D3D11_USAGE_IMMUTABLE;
 	bd.ByteWidth = sizeof(uint32_t) * m_NumIndices;
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 	bd.MiscFlags = 0;
 	initData.pSysMem = indices.data();
@@ -64,11 +62,11 @@ Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std
 
 Mesh::~Mesh()
 {
-	
+	if (m_pEffect) delete m_pEffect;
 	if(m_pInputLayout) m_pInputLayout->Release();
 	if(m_pVertexBuffer) m_pVertexBuffer->Release();
 	if(m_pIndexBuffer) m_pIndexBuffer->Release();
-	if (m_pEffect) delete m_pEffect;
+	
 }
 
 void Mesh::Render(ID3D11DeviceContext* pDeviceContext)
@@ -86,7 +84,6 @@ void Mesh::Render(ID3D11DeviceContext* pDeviceContext)
 
 	//4. Set IndexBuffer
 	pDeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
 
 	//5. Draw
 	D3DX11_TECHNIQUE_DESC techDesc{};

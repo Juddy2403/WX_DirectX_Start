@@ -1,7 +1,7 @@
 #pragma once
 #include "Vector3.h"
 #include "Vector4.h"
-
+#include "DirectXMath.h"
 namespace dae {
 	struct Matrix
 	{
@@ -12,16 +12,15 @@ namespace dae {
 			const Vector3& zAxis,
 			const Vector3& t);
 
-		Matrix(const DirectX::XMMATRIX& dxMatrix);
-
 		Matrix(
 			const Vector4& xAxis,
 			const Vector4& yAxis,
 			const Vector4& zAxis,
 			const Vector4& t);
 
+		Matrix(const DirectX::XMMATRIX& m);
+
 		Matrix(const Matrix& m);
-		~Matrix();
 
 		Vector3 TransformVector(const Vector3& v) const;
 		Vector3 TransformVector(float x, float y, float z) const;
@@ -58,8 +57,6 @@ namespace dae {
 		Vector4 operator[](int index) const;
 		Matrix operator*(const Matrix& m) const;
 		const Matrix& operator*=(const Matrix& m);
-
-	private:
 
 		//Row-Major Matrix
 		Vector4 data[4]

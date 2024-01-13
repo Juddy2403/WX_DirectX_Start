@@ -1,3 +1,4 @@
+#pragma once
 #include "pch.h"
 
 #include "Matrix.h"
@@ -5,8 +6,8 @@
 #include <cassert>
 
 #include "MathHelpers.h"
-#include "directxmath.h"
 #include <cmath>
+#include "DirectXMath.h"
 
 namespace dae {
 	Matrix::Matrix(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis, const Vector3& t) :
@@ -15,14 +16,6 @@ namespace dae {
 		
 	}
 
-	Matrix::Matrix(const DirectX::XMMATRIX& dxMatrix): Matrix(
-		Vector4{ dxMatrix.r[0].m128_f32[0],dxMatrix.r[0].m128_f32[1],dxMatrix.r[0].m128_f32[2],dxMatrix.r[0].m128_f32[3] },
-		Vector4{ dxMatrix.r[1].m128_f32[0],dxMatrix.r[1].m128_f32[1],dxMatrix.r[1].m128_f32[2],dxMatrix.r[1].m128_f32[3] },
-		Vector4{ dxMatrix.r[2].m128_f32[0],dxMatrix.r[2].m128_f32[1],dxMatrix.r[2].m128_f32[2],dxMatrix.r[2].m128_f32[3] },
-		Vector4{ dxMatrix.r[3].m128_f32[0],dxMatrix.r[3].m128_f32[1],dxMatrix.r[3].m128_f32[2],dxMatrix.r[3].m128_f32[3] })
-	{
-	
-	}
 
 	Matrix::Matrix(const Vector4& xAxis, const Vector4& yAxis, const Vector4& zAxis, const Vector4& t)
 	{
@@ -32,6 +25,15 @@ namespace dae {
 		data[3] = t;
 	}
 
+	Matrix::Matrix(const DirectX::XMMATRIX& m) : Matrix(
+		{ m.r[0].m128_f32[0],m.r[0].m128_f32[1],m.r[0].m128_f32[2],m.r[0].m128_f32[3] },
+		{ m.r[1].m128_f32[0],m.r[1].m128_f32[1],m.r[1].m128_f32[2],m.r[1].m128_f32[3] },
+		{ m.r[2].m128_f32[0],m.r[2].m128_f32[1],m.r[2].m128_f32[2],m.r[2].m128_f32[3] },
+		{ m.r[3].m128_f32[0],m.r[3].m128_f32[1],m.r[3].m128_f32[2],m.r[3].m128_f32[3] }
+	)
+	{
+	}
+
 	Matrix::Matrix(const Matrix& m)
 	{
 		data[0] = m[0];
@@ -39,12 +41,6 @@ namespace dae {
 		data[2] = m[2];
 		data[3] = m[3];
 	}
-
-	Matrix::~Matrix()
-	{
-		//if (cDataPtr != nullptr) delete cDataPtr;
-	}
-
 
 	Vector3 Matrix::TransformVector(const Vector3& v) const
 	{
@@ -190,7 +186,7 @@ namespace dae {
 			Vector4{0,0,z1,1},
 			Vector4{0,0,z2,0}
 		};*/
-		const DirectX::XMMATRIX persMatrixDX = DirectX::XMMatrixPerspectiveFovLH(fov, aspect, zn, zf);
+		const DirectX::XMMATRIX persMatrixDX = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(fov), aspect, zn, zf);
 
 		return Matrix{ persMatrixDX };
 	}

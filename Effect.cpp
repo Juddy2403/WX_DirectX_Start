@@ -18,34 +18,34 @@ Effect::Effect(ID3D11Device* pDevice, const std::wstring& assetFile)
 
 Effect::~Effect()
 {
-	if (m_pTechnique) m_pTechnique->Release();
-	if(m_pEffect) m_pEffect->Release();
+	if (m_pEffect) 
+	{
+		m_pEffect->Release();
+		m_pEffect = nullptr;
+	}
+	//if (m_pWorldViewProjMatrix) m_pWorldViewProjMatrix->Release();
 }
 
 ID3DX11Effect* Effect::LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
 {
 	HRESULT result;
 	ID3D10Blob* pErrorBlob{ nullptr };
-	ID3DX11Effect* pEffect{ nullptr };
+	ID3DX11Effect* pEffect;
 
-	DWORD shaderFlags{ 0 };
-
-#if defined(DEBUG) || defined(_DEBUG)
+	DWORD shaderFlags = 0;
+#if defined( DEBUG ) || defined( _DEBUG )
 	shaderFlags |= D3DCOMPILE_DEBUG;
 	shaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 
-	result = D3DX11CompileEffectFromFile
-	(
-		assetFile.c_str(),
+	result = D3DX11CompileEffectFromFile(assetFile.c_str(),
 		nullptr,
 		nullptr,
 		shaderFlags,
 		0,
 		pDevice,
 		&pEffect,
-		&pErrorBlob
-	);
+		&pErrorBlob);
 
 	if (FAILED(result))
 	{
@@ -53,27 +53,27 @@ ID3DX11Effect* Effect::LoadEffect(ID3D11Device* pDevice, const std::wstring& ass
 		{
 			const char* pErrors = static_cast<char*>(pErrorBlob->GetBufferPointer());
 
-			std::wstringstream stringStream;
+			std::wstringstream ss;
 			for (unsigned int i = 0; i < pErrorBlob->GetBufferSize(); i++)
-				stringStream << pErrors[i];
+				ss << pErrors[i];
 
-			OutputDebugStringW(stringStream.str().c_str());
+			OutputDebugStringW(ss.str().c_str());
 			pErrorBlob->Release();
 			pErrorBlob = nullptr;
 
-			std::wcout << stringStream.str() << std::endl;
+			std::wcout << ss.str() << std::endl;
 		}
 		else
 		{
-			std::wstringstream stringStream;
-			stringStream << "EffectLoader failed to create affect from file!\nPath: " << assetFile;
-			std::wcout << stringStream.str() << std::endl;
+			std::wstringstream ss;
+			ss << "EffectLoader: Failed to CreateEffectFromFile!\nPath: " << assetFile;
+			std::wcout << ss.str() << std::endl;
 			return nullptr;
 		}
 	}
-
 	return pEffect;
 }
+
 
 ID3DX11Effect* Effect::GetEffect()
 {
