@@ -8,7 +8,7 @@ Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std
 	m_NumIndices{ static_cast<uint32_t>(indices.size()) }
 {
 	// Create vertex layout
-	static constexpr uint32_t numElements{ 2 };
+	static constexpr uint32_t numElements{ 3 };
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
 
 	vertexDesc[0].SemanticName = "POSITION";
@@ -16,10 +16,15 @@ Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std
 	vertexDesc[0].AlignedByteOffset = 0;
 	vertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
-	vertexDesc[1].SemanticName = "COLOR";
-	vertexDesc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[1].SemanticName = "TEXCOORD";
+	vertexDesc[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	vertexDesc[1].AlignedByteOffset = 12;
 	vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	vertexDesc[2].SemanticName = "COLOR";
+	vertexDesc[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[2].AlignedByteOffset = 20;
+	vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 	//Create input layout
 	D3DX11_PASS_DESC passDesc{};
@@ -98,4 +103,11 @@ void Mesh::Render(ID3D11DeviceContext* pDeviceContext)
 void Mesh::UpdateWorldViewProjMatrix(const float* pData)
 {
 	m_pEffect->SetWorldViewProjMatrix(pData);
+}
+
+
+void Mesh::SetDiffuseMap(Texture* pDiffuseTexture)
+{
+	if (m_pEffect)
+		m_pEffect->SetDiffuseMap(pDiffuseTexture);
 }

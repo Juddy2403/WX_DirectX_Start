@@ -30,7 +30,6 @@ namespace dae
 		float totalPitch{};
 		float totalYaw{};
 
-		Matrix invViewMatrix{};
 		Matrix viewMatrix{};
 		Matrix projectionMatrix{};
 
@@ -48,20 +47,14 @@ namespace dae
 
 		void CalculateViewMatrix()
 		{
-			//ONB => invViewMatrix
-			//Inverse(ONB) => ViewMatrix
 			viewMatrix = Matrix::CreateLookAtLH(origin, forward,up);
 
 			//invViewMatrix = viewMatrix.Inverse();
-
-			//DirectX Implementation => https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dxmatrixlookatlh
 		}
 
 		void CalculateProjectionMatrix()
 		{
-
 			projectionMatrix = Matrix::CreatePerspectiveFovLH(fovAngle, aspectRatio, m_Near, m_Far);
-			//DirectX Implementation => https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dxmatrixperspectivefovlh
 		}
 
 		void Update(const Timer* pTimer)
@@ -77,7 +70,7 @@ namespace dae
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 
-			const float movementSpeed{ 20.f }, rotationSpeed{ 100.f };
+			const float movementSpeed{ 10.f }, rotationSpeed{ 50.f };
 
 			if (pKeyboardState[SDL_SCANCODE_W]) origin += (movementSpeed * deltaTime) * forward.Normalized();
 			if (pKeyboardState[SDL_SCANCODE_S]) origin -= (movementSpeed * deltaTime) * forward.Normalized();

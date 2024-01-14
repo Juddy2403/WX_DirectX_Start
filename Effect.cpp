@@ -14,16 +14,24 @@ Effect::Effect(ID3D11Device* pDevice, const std::wstring& assetFile)
 	{
 		std::wcout << L"m_pWorldViewProjMatrix not valid!\n";
 	}
+
+	m_pDiffuseMap = m_pEffect->GetVariableByName("gDiffuseMap")->AsShaderResource();
+	if (!m_pDiffuseMap->IsValid())
+	{
+		std::wcout << L"m_pDiffuseMap not valid!\n";
+	}
 }
 
 Effect::~Effect()
 {
 	if (m_pEffect) 
 	{
+		if (m_pWorldViewProjMatrix) m_pWorldViewProjMatrix->Release();
+		if (m_pDiffuseMap) m_pDiffuseMap->Release();
 		m_pEffect->Release();
 		m_pEffect = nullptr;
 	}
-	//if (m_pWorldViewProjMatrix) m_pWorldViewProjMatrix->Release();
+	
 }
 
 ID3DX11Effect* Effect::LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
@@ -88,4 +96,10 @@ ID3DX11EffectTechnique* Effect::GetTechnique()
 void Effect::SetWorldViewProjMatrix(const float* pData)
 {
 	m_pWorldViewProjMatrix->SetMatrix(pData);
+}
+
+void Effect::SetDiffuseMap(Texture* pDiffuseTexture)
+{
+	if (m_pDiffuseMap)
+		m_pDiffuseMap->SetResource(pDiffuseTexture->GetTexture());
 }

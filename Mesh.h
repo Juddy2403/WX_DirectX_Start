@@ -1,13 +1,16 @@
 #pragma once
 #include "Effect.h"
+#include "Texture.h"
 
 struct Vertex {
 	dae::Vector3 position;
+	dae::Vector2 texCoord;
 	dae::Vector3 color;
 };
 
 struct Vertex_Out {
 	dae::Vector4 position;
+	dae::Vector2 texCoord;
 	dae::Vector3 color;
 };
 
@@ -18,6 +21,8 @@ public:
 	~Mesh();
 	void Render(ID3D11DeviceContext* m_pDeviceContext);
 	void UpdateWorldViewProjMatrix(const float* pData);
+
+	void SetDiffuseMap(Texture* pDiffuseTexture);
 
 private:
 	Effect* m_pEffect;
