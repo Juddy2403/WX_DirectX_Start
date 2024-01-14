@@ -5,13 +5,21 @@
 struct Vertex {
 	dae::Vector3 position;
 	dae::Vector2 texCoord;
-	dae::Vector3 color;
+	dae::ColorRGB color{ dae::colors::White };
+	//dae::Vector3 normal{};
+	//dae::Vector3 tangent{};
 };
 
 struct Vertex_Out {
 	dae::Vector4 position;
 	dae::Vector2 texCoord;
 	dae::Vector3 color;
+};
+
+enum class SamplerState {
+	point,
+	linear,
+	anisotropic
 };
 
 class Mesh final
@@ -23,12 +31,14 @@ public:
 	void UpdateWorldViewProjMatrix(const float* pData);
 
 	void SetDiffuseMap(Texture* pDiffuseTexture);
-
+	void ChangeSamplerState();
 private:
 	Effect* m_pEffect;
 	ID3D11InputLayout* m_pInputLayout;
 	ID3D11Buffer* m_pVertexBuffer;
 	ID3D11Buffer* m_pIndexBuffer;
 	uint32_t m_NumIndices;
+
+	SamplerState m_SamplerState{ SamplerState::point };
 };
 

@@ -36,10 +36,12 @@ namespace dae
 		const float m_Near{ .01f };
 		const float m_Far{ 1000.f };
 		float aspectRatio{};
+		float fov{};
 
 		void Initialize(float _fovAngle = 90.f, Vector3 _origin = { 0.f,0.f,0.f }, float _aspectRatio = 1.f)
 		{
 			fovAngle = _fovAngle;
+			fov = tanf((_fovAngle * TO_RADIANS) / 2.f);
 			aspectRatio = _aspectRatio;
 			CalculateProjectionMatrix();
 			origin = _origin;
@@ -49,12 +51,13 @@ namespace dae
 		{
 			viewMatrix = Matrix::CreateLookAtLH(origin, forward,up);
 
-			//invViewMatrix = viewMatrix.Inverse();
+			viewMatrix = viewMatrix.Inverse();
 		}
 
 		void CalculateProjectionMatrix()
 		{
-			projectionMatrix = Matrix::CreatePerspectiveFovLH(fovAngle, aspectRatio, m_Near, m_Far);
+			//float fov = tanf((fovAngle * TO_RADIANS) / 2.f);
+			projectionMatrix = Matrix::CreatePerspectiveFovLH(fov, aspectRatio, m_Near, m_Far);
 		}
 
 		void Update(const Timer* pTimer)

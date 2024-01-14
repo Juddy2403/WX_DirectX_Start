@@ -20,7 +20,7 @@ namespace dae
 
 		void Update(const Timer* pTimer);
 		void Render() const;
-
+		void ChangeSamplerState();
 	private:
 		SDL_Window* m_pWindow{};
 

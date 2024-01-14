@@ -4,7 +4,7 @@
 
 Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) :
 	m_pEffect{ new Effect{pDevice, L"Resources/PosCol3D.fx"} },
-	m_pInputLayout{nullptr},
+	m_pInputLayout{ nullptr },
 	m_NumIndices{ static_cast<uint32_t>(indices.size()) }
 {
 	// Create vertex layout
@@ -49,7 +49,7 @@ Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std
 
 	D3D11_SUBRESOURCE_DATA initData = {};
 	initData.pSysMem = vertices.data();
-	
+
 	result = pDevice->CreateBuffer(&bd, &initData, &m_pVertexBuffer);
 	assert(result == S_OK);
 
@@ -68,10 +68,10 @@ Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std
 Mesh::~Mesh()
 {
 	if (m_pEffect) delete m_pEffect;
-	if(m_pInputLayout) m_pInputLayout->Release();
-	if(m_pVertexBuffer) m_pVertexBuffer->Release();
-	if(m_pIndexBuffer) m_pIndexBuffer->Release();
-	
+	if (m_pInputLayout) m_pInputLayout->Release();
+	if (m_pVertexBuffer) m_pVertexBuffer->Release();
+	if (m_pIndexBuffer) m_pIndexBuffer->Release();
+
 }
 
 void Mesh::Render(ID3D11DeviceContext* pDeviceContext)
@@ -93,9 +93,9 @@ void Mesh::Render(ID3D11DeviceContext* pDeviceContext)
 	//5. Draw
 	D3DX11_TECHNIQUE_DESC techDesc{};
 	m_pEffect->GetTechnique()->GetDesc(&techDesc);
-	for (UINT p = 0; p < techDesc.Passes; ++p)
+	if (UINT(m_SamplerState) < techDesc.Passes)
 	{
-		m_pEffect->GetTechnique()->GetPassByIndex(p)->Apply(0, pDeviceContext);
+		m_pEffect->GetTechnique()->GetPassByIndex(UINT(m_SamplerState))->Apply(0, pDeviceContext);
 		pDeviceContext->DrawIndexed(m_NumIndices, 0, 0);
 	}
 }
@@ -110,4 +110,10 @@ void Mesh::SetDiffuseMap(Texture* pDiffuseTexture)
 {
 	if (m_pEffect)
 		m_pEffect->SetDiffuseMap(pDiffuseTexture);
+}
+
+void Mesh::ChangeSamplerState()
+{
+	m_SamplerState = SamplerState((static_cast<int>(m_SamplerState) + 1) % 3);
+	std::wcout << int(m_SamplerState) << "\n";
 }

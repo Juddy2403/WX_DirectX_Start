@@ -159,23 +159,39 @@ namespace dae {
 
 	Matrix Matrix::CreateLookAtLH(const Vector3& origin, const Vector3& forward, const Vector3& up)
 	{
-		/*const Vector3 right = Vector3::Cross(Vector3::UnitY, forward).Normalized();
-		const Vector3 up = Vector3::Cross(forward, right).Normalized();
+		const Vector3 right = Vector3::Cross(Vector3::UnitY, forward).Normalized();
+		//const Vector3 up2 = Vector3::Cross(forward, right).Normalized();
 
 		return Matrix{
 			Vector4 {right, 0},
 			Vector4 {up, 0},
 			Vector4 {forward, 0},
 			Vector4 {origin, 1}
-		};*/
-		const DirectX::XMMATRIX viewMatrixDX = DirectX::XMMatrixLookAtLH(origin.GetDirectXVec(), forward.GetDirectXVec(), up.GetDirectXVec());
+		};
 
-		return Matrix{ viewMatrixDX };
+		/*const DirectX::XMMATRIX viewMatrixDX = DirectX::XMMatrixLookAtLH(origin.GetDirectXVec(), forward.GetDirectXVec(), up.GetDirectXVec());
+		return Matrix{ viewMatrixDX };*/
+
+		/*Vector3 zAxis = forward.Normalized();
+		Vector3 xAxis = Vector3::Cross(up, zAxis).Normalized();
+		Vector3 yAxis = Vector3::Cross(zAxis, xAxis);
+
+		float eyeX = -Vector3::Dot(xAxis, origin);
+		float eyeY = -Vector3::Dot(yAxis, origin);
+		float eyeZ = -Vector3::Dot(zAxis, origin);
+
+		return Matrix
+		{
+			Vector4(xAxis, eyeX),
+			Vector4(yAxis, eyeY),
+			Vector4(zAxis, eyeZ),
+			Vector4(0.0f, 0.0f, 0.0f, 1.0f)
+		};*/
 	}
 
 	Matrix Matrix::CreatePerspectiveFovLH(float fov, float aspect, float zn, float zf)
 	{
-		/*const float x{ 1.f / (aspect * fov) };
+		const float x{ 1.f / (aspect * fov) };
 		const float y{ 1.f / fov };
 		const float renderDist{ zf - zn };
 		const float z1{ zf / renderDist };
@@ -185,10 +201,10 @@ namespace dae {
 			Vector4{0,y,0,0},
 			Vector4{0,0,z1,1},
 			Vector4{0,0,z2,0}
-		};*/
-		const DirectX::XMMATRIX persMatrixDX = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(fov), aspect, zn, zf);
+		};
+		/*const DirectX::XMMATRIX persMatrixDX = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(fov), aspect, zn, zf);
 
-		return Matrix{ persMatrixDX };
+		return Matrix{ persMatrixDX };*/
 	}
 
 	Vector3 Matrix::GetAxisX() const

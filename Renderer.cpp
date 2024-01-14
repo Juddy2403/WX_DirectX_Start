@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Renderer.h"
-
+#include "Utils.h"
 
 namespace dae {
 
@@ -22,35 +22,39 @@ namespace dae {
 			std::cout << "DirectX initialization failed!\n";
 		}
 
-		const std::vector<Vertex> vertices
-		{
+		//const std::vector<Vertex> vertices
+		//{
 
-			//{{ 0.f, 3.f, 2.f}, {1.0f,0.0f,0.0f}}, //texcoord
-			//{{ 3.f,-3.f, 2.f}, {0.0f,0.0f,1.0f}},
-			//{{-3.f,-3.f, 2.f}, {0.0f,1.0f,0.0f}},
-			Vertex{ Vector3{-3,3,-2}, Vector2{0,0}},
-				Vertex{ Vector3{0,3,-2}, Vector2{0.5f,0}},
-				Vertex{ Vector3{3,3,-2}, Vector2{1,0}},
-				Vertex{ Vector3{-3,0,-2}, Vector2{0,0.5f}},
-				Vertex{ Vector3{0,0,-2}, Vector2{0.5f,0.5f}},
-				Vertex{ Vector3{3,0,-2}, Vector2{1,0.5f}},
-				Vertex{ Vector3{-3,-3,-2}, Vector2{0,1}},
-				Vertex{ Vector3{0,-3,-2}, Vector2{0.5f,1}},
-				Vertex{ Vector3{3,-3,-2}, Vector2{1,1}}
-		};
+		//	//{{ 0.f, 3.f, 2.f}, {1.0f,0.0f,0.0f}}, //texcoord
+		//	//{{ 3.f,-3.f, 2.f}, {0.0f,0.0f,1.0f}},
+		//	//{{-3.f,-3.f, 2.f}, {0.0f,1.0f,0.0f}},
+		//	Vertex{ Vector3{-3,3,-2}, Vector2{0,0}},
+		//		Vertex{ Vector3{0,3,-2}, Vector2{0.5f,0}},
+		//		Vertex{ Vector3{3,3,-2}, Vector2{1,0}},
+		//		Vertex{ Vector3{-3,0,-2}, Vector2{0,0.5f}},
+		//		Vertex{ Vector3{0,0,-2}, Vector2{0.5f,0.5f}},
+		//		Vertex{ Vector3{3,0,-2}, Vector2{1,0.5f}},
+		//		Vertex{ Vector3{-3,-3,-2}, Vector2{0,1}},
+		//		Vertex{ Vector3{0,-3,-2}, Vector2{0.5f,1}},
+		//		Vertex{ Vector3{3,-3,-2}, Vector2{1,1}}
+		//};
 
-		const std::vector<uint32_t> indices{ 
-					3,0,1,  1,4,3,  4,1,2,  //triangle list
-					2,5,4,  6,3,4,  4,7,6,
-					7,4,5,  5,8,7 
-					/*3,0,4,1,5,2,			//trianlge strip
-					2,6,
-					6,3,7,4,8,5*/ };
+		//const std::vector<uint32_t> indices{ 
+		//			3,0,1,  1,4,3,  4,1,2,  //triangle list
+		//			2,5,4,  6,3,4,  4,7,6,
+		//			7,4,5,  5,8,7 
+		//			/*3,0,4,1,5,2,			//trianlge strip
+		//			2,6,
+		//			6,3,7,4,8,5*/ };
+		m_Camera.Initialize(45.f, Vector3{ 0.f,0.f,-50.f }, static_cast<float>(m_Width) / static_cast<float>(m_Height));
 
+		std::vector<Vertex> vertices{};
+		std::vector<uint32_t> indices{};
+		if (!Utils::ParseOBJ("Resources/vehicle.obj", vertices, indices))
+			std::wcout << L"Object init failed!\n";
 		m_pMesh = new Mesh{m_pDevice,vertices,indices };
-		m_pDiffuseTexture = new Texture{ "Resources/uv_grid_2.png",m_pDevice };
+		m_pDiffuseTexture = new Texture{ "Resources/vehicle_diffuse.png",m_pDevice };
 		m_pMesh->SetDiffuseMap(m_pDiffuseTexture);
-		m_Camera.Initialize(70.f, Vector3{ 0.f,0.f,-10.f }, static_cast<float>(m_Width) / static_cast<float>(m_Height));
 	}
 
 	Renderer::~Renderer()
@@ -103,6 +107,11 @@ namespace dae {
 		//3. Present backbuffer (SWAP)
 		m_pSwapChain->Present(0, 0);
 
+	}
+
+	void Renderer::ChangeSamplerState()
+	{
+		m_pMesh->ChangeSamplerState();
 	}
 
 	HRESULT Renderer::InitializeDirectX()
