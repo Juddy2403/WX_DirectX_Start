@@ -53,7 +53,7 @@ namespace dae {
 		std::vector<uint32_t> indices{};
 		if (!Utils::ParseOBJ("Resources/vehicle.obj", vertices, indices))
 			std::wcout << L"Object init failed!\n";
-		m_pMesh = new Mesh{m_pDevice,vertices,indices };
+		m_pMesh = new Mesh{ m_pDevice,vertices,indices };
 
 		//Loading texture maps
 		m_pDiffuseTexture = new Texture{ "Resources/vehicle_diffuse.png",m_pDevice };
@@ -92,15 +92,16 @@ namespace dae {
 
 	void Renderer::Update(const Timer* pTimer)
 	{
-		m_Camera.Update(pTimer); 
+		m_Camera.Update(pTimer);
 		m_pMesh->SetCameraPos(&m_Camera.origin.x);
 
-		m_YawRotation += pTimer->GetElapsed();
-		m_pMesh->RotateMesh(Vector3{ 0.f,m_YawRotation,0.f });
-		//meshes_world[0].worldMatrix = meshes_world[0].rotationMatrix * meshes_world[0].translateMatrix;
-		const Matrix viewProjMatrix =m_pMesh->GetWorldMatrix()* m_Camera.viewMatrix * m_Camera.projectionMatrix;
-		
-		m_pMesh->UpdateWorldViewProjMatrix(&viewProjMatrix.data[0].x);
+		if(m_IsRotating)
+		{
+			m_YawRotation += pTimer->GetElapsed();
+			m_pMesh->RotateMesh(Vector3{ 0.f,m_YawRotation,0.f });
+			const Matrix viewProjMatrix = m_pMesh->GetWorldMatrix() * m_Camera.viewMatrix * m_Camera.projectionMatrix;
+			m_pMesh->UpdateWorldViewProjMatrix(&viewProjMatrix.data[0].x);
+		}
 
 	}
 
@@ -116,7 +117,7 @@ namespace dae {
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
 		//2. Set pipeline + invoke draw calls (=render)
-		
+
 		m_pMesh->Render(m_pDeviceContext);
 
 		//3. Present backbuffer (SWAP)
@@ -127,6 +128,11 @@ namespace dae {
 	void Renderer::ChangeSamplerState()
 	{
 		m_pMesh->ChangeSamplerState();
+	}
+
+	void Renderer::ToggleRotation()
+	{
+		m_IsRotating = !m_IsRotating;
 	}
 
 	HRESULT Renderer::InitializeDirectX()
@@ -190,7 +196,7 @@ namespace dae {
 		depthStencilDesc.MiscFlags = 0;
 
 		//View
-		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc {};
+		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{};
 		depthStencilViewDesc.Format = depthStencilDesc.Format;
 		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		depthStencilViewDesc.Texture2D.MipSlice = 0;
@@ -231,4 +237,3 @@ namespace dae {
 		return S_OK;
 	}
 }
- 

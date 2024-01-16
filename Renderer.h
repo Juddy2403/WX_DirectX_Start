@@ -21,6 +21,7 @@ namespace dae
 		void Update(const Timer* pTimer);
 		void Render() const;
 		void ChangeSamplerState();
+		void ToggleRotation();
 	private:
 		SDL_Window* m_pWindow{};
 
@@ -46,6 +47,7 @@ namespace dae
 		Texture* m_pGlossinessTexture;
 		Texture* m_pSpecularTexture;
 		Texture* m_pNormalTexture;
+		bool m_IsRotating{ true };
 		float m_YawRotation{};
 	};
 }

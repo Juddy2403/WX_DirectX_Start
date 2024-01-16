@@ -59,6 +59,8 @@ int main(int argc, char* args[])
 				//Test for a key
 				if (e.key.keysym.scancode == SDL_SCANCODE_F2)
 					pRenderer->ChangeSamplerState();
+				if (e.key.keysym.scancode == SDL_SCANCODE_R)
+					pRenderer->ToggleRotation();
 				break;
 			default: ;
 			}
