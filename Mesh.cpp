@@ -5,10 +5,14 @@
 Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) :
 	m_pEffect{ new Effect{pDevice, L"Resources/PosCol3D.fx"} },
 	m_pInputLayout{ nullptr },
-	m_NumIndices{ static_cast<uint32_t>(indices.size()) }
+	m_NumIndices{ static_cast<uint32_t>(indices.size()) },
+	m_WorldMatrix{},
+	m_Translation{},
+	m_Scale{1,1,1},
+	m_RotationAngle{}
 {
 	// Create vertex layout
-	static constexpr uint32_t numElements{ 3 };
+	static constexpr uint32_t numElements{ 5 };
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
 
 	vertexDesc[0].SemanticName = "POSITION";
@@ -21,10 +25,20 @@ Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std
 	vertexDesc[1].AlignedByteOffset = 12;
 	vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
-	vertexDesc[2].SemanticName = "COLOR";
+	vertexDesc[2].SemanticName = "NORMAL";
 	vertexDesc[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	vertexDesc[2].AlignedByteOffset = 20;
 	vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	vertexDesc[3].SemanticName = "TANGENT";
+	vertexDesc[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[3].AlignedByteOffset = 32;
+	vertexDesc[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	vertexDesc[4].SemanticName = "COLOR";
+	vertexDesc[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[4].AlignedByteOffset = 44;
+	vertexDesc[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 	//Create input layout
 	D3DX11_PASS_DESC passDesc{};
@@ -116,4 +130,14 @@ void Mesh::ChangeSamplerState()
 {
 	m_SamplerState = SamplerState((static_cast<int>(m_SamplerState) + 1) % 3);
 	std::wcout << int(m_SamplerState) << "\n";
+}
+
+dae::Matrix Mesh::GetWorldMatrix()
+{
+	return m_WorldMatrix;
+}
+
+void Mesh::RotateMesh(const dae::Vector3& rotation)
+{
+	m_WorldMatrix = dae::Matrix::CreateRotation(rotation);
 }

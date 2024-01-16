@@ -83,7 +83,10 @@ namespace dae {
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_Camera.Update(pTimer); 
-		const Matrix viewProjMatrix = m_Camera.viewMatrix * m_Camera.projectionMatrix;
+		m_YawRotation += pTimer->GetElapsed();
+		m_pMesh->RotateMesh(Vector3{ 0.f,m_YawRotation,0.f });
+		//meshes_world[0].worldMatrix = meshes_world[0].rotationMatrix * meshes_world[0].translateMatrix;
+		const Matrix viewProjMatrix =m_pMesh->GetWorldMatrix()* m_Camera.viewMatrix * m_Camera.projectionMatrix;
 		
 		m_pMesh->UpdateWorldViewProjMatrix(&viewProjMatrix.data[0].x);
 

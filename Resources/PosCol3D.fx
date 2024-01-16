@@ -8,6 +8,8 @@ struct VS_INPUT
 {
     float3 Position : POSITION;
     float2 TexCoord : TEXCOORD;
+    float3 Normal : NORMAL;
+    float3 Tangent : TANGENT;
     float3 Color : COLOR;
 };
 
@@ -15,6 +17,8 @@ struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
     float2 TexCoord : TEXCOORD;
+    float3 Normal : NORMAL;
+    float3 Tangent : TANGENT;
     float3 Color : COLOR;
 };
 

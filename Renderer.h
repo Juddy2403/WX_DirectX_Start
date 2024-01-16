@@ -43,6 +43,6 @@ namespace dae
 		Camera m_Camera;
 		Mesh* m_pMesh{};
 		Texture* m_pDiffuseTexture;
-
+		float m_YawRotation{};
 	};
 }
