@@ -119,17 +119,45 @@ void Mesh::UpdateWorldViewProjMatrix(const float* pData)
 	m_pEffect->SetWorldViewProjMatrix(pData);
 }
 
+void Mesh::SetCameraPos(const float* pData)
+{
+	m_pEffect->SetCameraPos(pData);
+}
+
+void Mesh::UpdateWorldMatrix()
+{
+	m_pEffect->SetWorldMatrix(&m_WorldMatrix.data[0].x);
+}
+
 
 void Mesh::SetDiffuseMap(Texture* pDiffuseTexture)
 {
-	if (m_pEffect)
-		m_pEffect->SetDiffuseMap(pDiffuseTexture);
+	if (m_pEffect) m_pEffect->SetDiffuseMap(pDiffuseTexture);
+	else std::wcout << L"Can't set diffuse map! m_pEffect is nullptr\n";
+}
+
+void Mesh::SetGlossinessMap(Texture* pGlossinessTexture)
+{
+	if (m_pEffect) m_pEffect->SetGlossinessMap(pGlossinessTexture);
+	else std::wcout << L"Can't set glossiness map! m_pEffect is nullptr\n";
+}
+
+void Mesh::SetSpecularMap(Texture* pSpecularTexture)
+{
+	if (m_pEffect) m_pEffect->SetSpecularMap(pSpecularTexture);
+	else std::wcout << L"Can't set specular map! m_pEffect is nullptr\n";
+}
+
+void Mesh::SetNormalMap(Texture* pNormalTexture)
+{
+	if (m_pEffect) m_pEffect->SetNormalMap(pNormalTexture);
+	else std::wcout << L"Can't set normal map! m_pEffect is nullptr\n";
 }
 
 void Mesh::ChangeSamplerState()
 {
 	m_SamplerState = SamplerState((static_cast<int>(m_SamplerState) + 1) % 3);
-	std::wcout << int(m_SamplerState) << "\n";
+	std::wcout<<L"Sampler state changed: " << int(m_SamplerState) << "\n";
 }
 
 dae::Matrix Mesh::GetWorldMatrix()
@@ -140,4 +168,5 @@ dae::Matrix Mesh::GetWorldMatrix()
 void Mesh::RotateMesh(const dae::Vector3& rotation)
 {
 	m_WorldMatrix = dae::Matrix::CreateRotation(rotation);
+	UpdateWorldMatrix();
 }

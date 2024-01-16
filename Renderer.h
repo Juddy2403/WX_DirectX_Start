@@ -43,6 +43,9 @@ namespace dae
 		Camera m_Camera;
 		Mesh* m_pMesh{};
 		Texture* m_pDiffuseTexture;
+		Texture* m_pGlossinessTexture;
+		Texture* m_pSpecularTexture;
+		Texture* m_pNormalTexture;
 		float m_YawRotation{};
 	};
 }

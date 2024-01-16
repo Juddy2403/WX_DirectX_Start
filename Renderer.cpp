@@ -48,13 +48,23 @@ namespace dae {
 		//			6,3,7,4,8,5*/ };
 		m_Camera.Initialize(45.f, Vector3{ 0.f,0.f,-50.f }, static_cast<float>(m_Width) / static_cast<float>(m_Height));
 
+		//Parsing the obj file
 		std::vector<Vertex> vertices{};
 		std::vector<uint32_t> indices{};
 		if (!Utils::ParseOBJ("Resources/vehicle.obj", vertices, indices))
 			std::wcout << L"Object init failed!\n";
 		m_pMesh = new Mesh{m_pDevice,vertices,indices };
+
+		//Loading texture maps
 		m_pDiffuseTexture = new Texture{ "Resources/vehicle_diffuse.png",m_pDevice };
+		m_pSpecularTexture = new Texture{ "Resources/vehicle_specular.png",m_pDevice };
+		m_pGlossinessTexture = new Texture{ "Resources/vehicle_gloss.png",m_pDevice };
+		m_pNormalTexture = new Texture{ "Resources/vehicle_normal.png",m_pDevice };
+
 		m_pMesh->SetDiffuseMap(m_pDiffuseTexture);
+		m_pMesh->SetGlossinessMap(m_pGlossinessTexture);
+		m_pMesh->SetNormalMap(m_pNormalTexture);
+		m_pMesh->SetSpecularMap(m_pSpecularTexture);
 	}
 
 	Renderer::~Renderer()
@@ -83,6 +93,8 @@ namespace dae {
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_Camera.Update(pTimer); 
+		m_pMesh->SetCameraPos(&m_Camera.origin.x);
+
 		m_YawRotation += pTimer->GetElapsed();
 		m_pMesh->RotateMesh(Vector3{ 0.f,m_YawRotation,0.f });
 		//meshes_world[0].worldMatrix = meshes_world[0].rotationMatrix * meshes_world[0].translateMatrix;

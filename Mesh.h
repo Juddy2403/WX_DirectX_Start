@@ -29,12 +29,19 @@ public:
 	~Mesh();
 	void Render(ID3D11DeviceContext* m_pDeviceContext);
 	void UpdateWorldViewProjMatrix(const float* pData);
+	void SetCameraPos(const float* pData);
 
 	void SetDiffuseMap(Texture* pDiffuseTexture);
+	void SetGlossinessMap(Texture* pGlossinessTexture);
+	void SetSpecularMap(Texture* pSpecularTexture);
+	void SetNormalMap(Texture* pNormalTexture);
+	
 	void ChangeSamplerState();
 	dae::Matrix GetWorldMatrix();
 	void RotateMesh(const dae::Vector3& rotation);
 private:
+	void UpdateWorldMatrix();
+
 	Effect* m_pEffect;
 	ID3D11InputLayout* m_pInputLayout;
 	ID3D11Buffer* m_pVertexBuffer;
