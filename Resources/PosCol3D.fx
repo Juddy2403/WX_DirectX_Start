@@ -80,18 +80,15 @@ float3 Phong(float specularReflectance, float phongExp, float3 viewDir, float3 n
 	if (phongExp == 2) return specularRefl * cos * cos;
     return specularRefl * pow(cos, phongExp);
 }
-
-float4 PS_Point(VS_OUTPUT input) : SV_TARGET
+float4 PS(VS_OUTPUT input,SamplerState samplerState) : SV_TARGET
 {
     float gPI = 3.14;
     float gLightIntensity = 7.0f;
     float gShininess = 25.0f;
-
-    //input.Color = gDiffuseMap.Sample(samPoint, input.TexCoord);
     
     //Normal mapping
     float3 normal = normalize(input.Normal);
-    float3 normalMapSample = gNormalMap.Sample(samPoint, input.TexCoord);
+    float3 normalMapSample = gNormalMap.Sample(samplerState, input.TexCoord);
     // Remapping the value from [0,1] to [-1,1] 
     normalMapSample = 2 * normalMapSample - 1;
     // Transforming it in the correct tangent space
@@ -103,32 +100,34 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET
     
     float lightDirCos = dot(normal, -gLightDirection);
     
-    if(lightDirCos >= 0)
+    if (lightDirCos >= 0)
     {
         // Sampling color from maps
-        float glossinesMapSample = gGlossinessMap.Sample(samPoint, input.TexCoord);
-        float specularMapSample = gSpecularMap.Sample(samPoint, input.TexCoord);
+        float glossinesMapSample = gGlossinessMap.Sample(samplerState, input.TexCoord);
+        float specularMapSample = gSpecularMap.Sample(samplerState, input.TexCoord);
 		// SpecularColor sampled from SpecularMap and PhongExponent from GlossinessMap
         float3 specular = Phong(specularMapSample, glossinesMapSample * gShininess, input.ViewDirection, normal);
-        float3 cd = gDiffuseMap.Sample(samPoint, input.TexCoord);
-		float3 diffuse =  cd * gLightIntensity / gPI;
+        float3 cd = gDiffuseMap.Sample(samplerState, input.TexCoord);
+        float3 diffuse = cd * gLightIntensity / gPI;
         input.Color = lightDirCos * diffuse + specular;
         return float4(input.Color, 1.f);
     }
     
     return float4(0.f, 0.f, 0.f, 1.f);
 }
+float4 PS_Point(VS_OUTPUT input) : SV_TARGET
+{
+    return PS(input, samPoint);
+}
 
 float4 PS_Linear(VS_OUTPUT input) : SV_TARGET
 {
-    input.Color = gDiffuseMap.Sample(samLinear, input.TexCoord);
-    return float4(input.Color, 1.f);
+    return PS(input, samLinear);
 }
 
 float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET
 {
-    input.Color = gDiffuseMap.Sample(samAnisotropic, input.TexCoord);
-    return float4(input.Color, 1.f);
+    return PS(input, samAnisotropic);
 }
 
 //////////////////////////////////
