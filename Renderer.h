@@ -43,10 +43,12 @@ namespace dae
 
 		Camera m_Camera;
 		Mesh* m_pMesh{};
+		Mesh* m_pFireEffect{};
 		Texture* m_pDiffuseTexture;
 		Texture* m_pGlossinessTexture;
 		Texture* m_pSpecularTexture;
 		Texture* m_pNormalTexture;
+		Texture* m_pFireTexture;
 		bool m_IsRotating{ true };
 		float m_YawRotation{};
 	};

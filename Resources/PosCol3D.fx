@@ -33,6 +33,29 @@ struct VS_OUTPUT
 //////////////////////////////////
 //   Keeping track of all settings
 //////////////////////////////////
+DepthStencilState gDepthStencilState
+{
+    DepthEnable = true;
+    DepthWriteMask = ALL;
+    DepthFunc = less;
+    StencilEnable = false;
+
+    StencilReadMask = 0xFF;
+    StencilWriteMask = 0xFF;
+
+    FrontFaceStencilFunc = always;
+    BackFaceStencilFunc = always;
+
+    FrontFaceStencilDepthFail = keep;
+    BackFaceStencilDepthFail = keep;
+
+    FrontFaceStencilPass = keep;
+    BackFaceStencilPass = keep;
+
+    FrontFaceStencilFail = keep;
+    BackFaceStencilFail = keep;
+};
+
 SamplerState samPoint
 {
     Filter = MIN_MAG_MIP_POINT;
@@ -137,6 +160,7 @@ technique11 DefaultTechnique
 {
     pass P0
     {
+        SetDepthStencilState(gDepthStencilState, 0);
         SetVertexShader(CompileShader(vs_5_0, VS()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_Point()));
@@ -144,6 +168,7 @@ technique11 DefaultTechnique
 
     pass P1
     {
+        SetDepthStencilState(gDepthStencilState, 0);
         SetVertexShader(CompileShader(vs_5_0, VS()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_Linear()));
@@ -151,6 +176,7 @@ technique11 DefaultTechnique
 
     pass P2
     {
+        SetDepthStencilState(gDepthStencilState, 0);
         SetVertexShader(CompileShader(vs_5_0, VS()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_Anisotropic()));

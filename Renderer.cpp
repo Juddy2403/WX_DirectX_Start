@@ -52,15 +52,21 @@ namespace dae {
 		std::vector<Vertex> vertices{};
 		std::vector<uint32_t> indices{};
 		if (!Utils::ParseOBJ("Resources/vehicle.obj", vertices, indices))
-			std::wcout << L"Object init failed!\n";
+			std::wcout << L"Mesh init failed!\n";
 		m_pMesh = new Mesh{ m_pDevice,vertices,indices };
+
+		if (!Utils::ParseOBJ("Resources/fireFX.obj", vertices, indices))
+			std::wcout << L"Fire effect init failed!\n";
+		m_pFireEffect = new Mesh{ m_pDevice,vertices,indices,false };
 
 		//Loading texture maps
 		m_pDiffuseTexture = new Texture{ "Resources/vehicle_diffuse.png",m_pDevice };
 		m_pSpecularTexture = new Texture{ "Resources/vehicle_specular.png",m_pDevice };
 		m_pGlossinessTexture = new Texture{ "Resources/vehicle_gloss.png",m_pDevice };
 		m_pNormalTexture = new Texture{ "Resources/vehicle_normal.png",m_pDevice };
-
+		m_pFireTexture = new Texture{ "Resources/fireFX_diffuse.png",m_pDevice };
+		
+		m_pFireEffect->SetDiffuseMap(m_pFireTexture);
 		m_pMesh->SetDiffuseMap(m_pDiffuseTexture);
 		m_pMesh->SetGlossinessMap(m_pGlossinessTexture);
 		m_pMesh->SetNormalMap(m_pNormalTexture);
@@ -70,6 +76,7 @@ namespace dae {
 	Renderer::~Renderer()
 	{
 		if (m_pMesh) delete m_pMesh;
+		if (m_pFireEffect) delete m_pFireEffect;
 
 		if (m_pDeviceContext)
 		{
@@ -87,7 +94,14 @@ namespace dae {
 		if (m_pDepthStencilView) m_pDepthStencilView->Release();
 		if (m_pRenderTargetBuffer) m_pRenderTargetBuffer->Release();
 		if (m_pRenderTargetView) m_pRenderTargetView->Release();
+
+		//Releasing textures
 		delete m_pDiffuseTexture;
+		delete m_pGlossinessTexture;
+		delete m_pSpecularTexture;
+		delete m_pNormalTexture;
+		delete m_pFireTexture;
+
 	}
 
 	void Renderer::Update(const Timer* pTimer)
@@ -99,9 +113,11 @@ namespace dae {
 		{
 			m_YawRotation += pTimer->GetElapsed();
 			m_pMesh->RotateMesh(Vector3{ 0.f,m_YawRotation,0.f });
-			const Matrix viewProjMatrix = m_pMesh->GetWorldMatrix() * m_Camera.viewMatrix * m_Camera.projectionMatrix;
-			m_pMesh->UpdateWorldViewProjMatrix(&viewProjMatrix.data[0].x);
+			
 		}
+		const Matrix viewProjMatrix = m_pMesh->GetWorldMatrix() * m_Camera.viewMatrix * m_Camera.projectionMatrix;
+		m_pMesh->UpdateWorldViewProjMatrix(&viewProjMatrix.data[0].x);
+		m_pFireEffect->UpdateWorldViewProjMatrix(&viewProjMatrix.data[0].x);
 
 	}
 
@@ -119,7 +135,7 @@ namespace dae {
 		//2. Set pipeline + invoke draw calls (=render)
 
 		m_pMesh->Render(m_pDeviceContext);
-
+		m_pFireEffect->Render(m_pDeviceContext);
 		//3. Present backbuffer (SWAP)
 		m_pSwapChain->Present(0, 0);
 
@@ -128,6 +144,7 @@ namespace dae {
 	void Renderer::ChangeSamplerState()
 	{
 		m_pMesh->ChangeSamplerState();
+		m_pFireEffect->ChangeSamplerState();
 	}
 
 	void Renderer::ToggleRotation()
