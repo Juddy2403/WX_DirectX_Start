@@ -2,15 +2,16 @@
 #include "Mesh.h"
 #include <cassert>
 
-Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) :
-	m_pEffect{ new Effect{pDevice, L"Resources/PosCol3D.fx"} },
+Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, bool isComplexMesh) :
 	m_pInputLayout{ nullptr },
 	m_NumIndices{ static_cast<uint32_t>(indices.size()) },
 	m_WorldMatrix{},
 	m_Translation{},
 	m_Scale{1,1,1},
 	m_RotationAngle{}
-{
+{ 
+	if (isComplexMesh) m_pEffect = new ComplexEffect{ pDevice, L"Resources/PosCol3D.fx" };
+	else m_pEffect = new Effect{ pDevice, L"Resources/PosCol3D_Base.fx" };
 	// Create vertex layout
 	static constexpr uint32_t numElements{ 5 };
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
@@ -121,12 +122,12 @@ void Mesh::UpdateWorldViewProjMatrix(const float* pData)
 
 void Mesh::SetCameraPos(const float* pData)
 {
-	m_pEffect->SetCameraPos(pData);
+	static_cast<ComplexEffect*>(m_pEffect)->SetCameraPos(pData);
 }
 
 void Mesh::UpdateWorldMatrix()
 {
-	m_pEffect->SetWorldMatrix(&m_WorldMatrix.data[0].x);
+	static_cast<ComplexEffect*>(m_pEffect)->SetWorldMatrix(&m_WorldMatrix.data[0].x);
 }
 
 
@@ -138,19 +139,19 @@ void Mesh::SetDiffuseMap(Texture* pDiffuseTexture)
 
 void Mesh::SetGlossinessMap(Texture* pGlossinessTexture)
 {
-	if (m_pEffect) m_pEffect->SetGlossinessMap(pGlossinessTexture);
+	if (m_pEffect) static_cast<ComplexEffect*>(m_pEffect)->SetGlossinessMap(pGlossinessTexture);
 	else std::wcout << L"Can't set glossiness map! m_pEffect is nullptr\n";
 }
 
 void Mesh::SetSpecularMap(Texture* pSpecularTexture)
 {
-	if (m_pEffect) m_pEffect->SetSpecularMap(pSpecularTexture);
+	if (m_pEffect) static_cast<ComplexEffect*>(m_pEffect)->SetSpecularMap(pSpecularTexture);
 	else std::wcout << L"Can't set specular map! m_pEffect is nullptr\n";
 }
 
 void Mesh::SetNormalMap(Texture* pNormalTexture)
 {
-	if (m_pEffect) m_pEffect->SetNormalMap(pNormalTexture);
+	if (m_pEffect) static_cast<ComplexEffect*>(m_pEffect)->SetNormalMap(pNormalTexture);
 	else std::wcout << L"Can't set normal map! m_pEffect is nullptr\n";
 }
 

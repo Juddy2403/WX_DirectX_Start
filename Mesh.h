@@ -1,5 +1,5 @@
 #pragma once
-#include "Effect.h"
+#include "ComplexEffect.h"
 #include "Texture.h"
 
 struct Vertex {
@@ -25,7 +25,7 @@ enum class SamplerState {
 class Mesh final
 {
 public:
-	Mesh(ID3D11Device* pDevice,const std::vector<Vertex>& vertices,const std::vector<uint32_t>& indices);
+	Mesh(ID3D11Device* pDevice,const std::vector<Vertex>& vertices,const std::vector<uint32_t>& indices, bool isComplexMesh = true);
 	~Mesh();
 	void Render(ID3D11DeviceContext* m_pDeviceContext);
 	void UpdateWorldViewProjMatrix(const float* pData);
