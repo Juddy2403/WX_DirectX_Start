@@ -111,7 +111,8 @@ namespace dae {
 
 		if(m_IsRotating)
 		{
-			m_YawRotation += pTimer->GetElapsed();
+			const float degreesPerSec{ 45.f };
+			m_YawRotation +=TO_RADIANS * (pTimer->GetElapsed() * degreesPerSec);
 			m_pMesh->RotateMesh(Vector3{ 0.f,m_YawRotation,0.f });
 			
 		}
@@ -128,14 +129,13 @@ namespace dae {
 			return;
 
 		//1. Clear RTV & DSV
-		constexpr float color[4] = { 0.f,0.f,0.3f,1.f };
+		constexpr float color[4] = { 0.39f,0.59f,0.93f,1.f };
 		m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, color);
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
 		//2. Set pipeline + invoke draw calls (=render)
-
 		m_pMesh->Render(m_pDeviceContext);
-		m_pFireEffect->Render(m_pDeviceContext);
+		if(m_IsFireMeshActive)	m_pFireEffect->Render(m_pDeviceContext);
 		//3. Present backbuffer (SWAP)
 		m_pSwapChain->Present(0, 0);
 
@@ -150,6 +150,17 @@ namespace dae {
 	void Renderer::ToggleRotation()
 	{
 		m_IsRotating = !m_IsRotating;
+	}
+
+	void Renderer::ToggleNormals()
+	{
+		m_pMesh->ToggleNormals();
+	}
+
+	void Renderer::ToggleFireMesh()
+	{
+		m_IsFireMeshActive = !m_IsFireMeshActive;
+		std::wcout << L"Is fire mesh active: " << std::boolalpha << m_IsFireMeshActive<<"\n";
 	}
 
 	HRESULT Renderer::InitializeDirectX()

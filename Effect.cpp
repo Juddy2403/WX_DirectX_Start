@@ -28,6 +28,7 @@ Effect::~Effect()
 	if (m_pDiffuseMap) m_pDiffuseMap->Release();
 	if (m_pEffect)
 	{
+		m_pTechnique->Release();
 		m_pEffect->Release();
 		m_pEffect = nullptr;
 	}
@@ -100,6 +101,5 @@ void Effect::SetWorldViewProjMatrix(const float* pData)
 
 void Effect::SetDiffuseMap(Texture* pDiffuseTexture)
 {
-	if (m_pDiffuseMap)
-		m_pDiffuseMap->SetResource(pDiffuseTexture->GetTexture());
+	if (m_pDiffuseMap) m_pDiffuseMap->SetResource(pDiffuseTexture->GetTexture());
 }

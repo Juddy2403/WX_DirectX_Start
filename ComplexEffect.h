@@ -10,7 +10,7 @@ public:
 	
 	void SetWorldMatrix(const float* pData);
 	void SetCameraPos(const float* pData);
-
+	void ToggleNormals();
 	void SetGlossinessMap(Texture* pGlossinessTexture);
 	void SetSpecularMap(Texture* pSpecularTexture);
 	void SetNormalMap(Texture* pNormalTexture);
@@ -18,6 +18,8 @@ private:
 	//Extra variables needed for Phong calculus
 	ID3DX11EffectMatrixVariable* m_pWorldMatrix;
 	ID3DX11EffectVectorVariable* m_pCameraPos;
+	bool m_NormalsBool{ true };
+	ID3DX11EffectScalarVariable* m_pAreNormalsToggled;
 
 	//2DTexture maps
 	ID3DX11EffectShaderResourceVariable* m_pNormalMap;

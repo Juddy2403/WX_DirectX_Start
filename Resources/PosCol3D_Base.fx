@@ -73,7 +73,7 @@ SamplerState samLinear
 };
 SamplerState samAnisotropic
 {
-    Filter = MIN_MAG_MIP_LINEAR;
+    Filter = ANISOTROPIC;
     AddressU = Wrap;
     AddressV = Wrap;
 };

@@ -1,3 +1,4 @@
+
 //////////////////////////////////
 //   Input/Output structs
 //////////////////////////////////
@@ -10,6 +11,7 @@ Texture2D gGlossinessMap : GlossinessMap;
 float3 gLightDirection : LightDirection = { 0.577f, -0.577f, 0.577f };
 float4x4 gWorldMatrix : WORLD;
 float3 gCameraPosition : CAMERA;
+bool gAreNormalsToggled;
 
 struct VS_INPUT
 {
@@ -69,7 +71,7 @@ SamplerState samLinear
     AddressV = Wrap;
 };
 SamplerState samAnisotropic
-{ 
+{
     Filter = ANISOTROPIC;
     AddressU = Wrap;
     AddressV = Wrap;
@@ -103,42 +105,46 @@ float3 Phong(float specularReflectance, float phongExp, float3 viewDir, float3 n
 	if (phongExp == 2) return specularRefl * cos * cos;
     return specularRefl * pow(cos, phongExp);
 }
-float4 PS(VS_OUTPUT input,SamplerState samplerState) : SV_TARGET
+float4 PS(VS_OUTPUT input,SamplerState sampleState) : SV_TARGET
 {
     float gPI = 3.14;
     float gLightIntensity = 7.0f;
     float gShininess = 25.0f;
+    float3 ambient = float3(0.03f, 0.03f, 0.03f);
     
     //Normal mapping
     float3 normal = normalize(input.Normal);
-    float3 normalMapSample = gNormalMap.Sample(samplerState, input.TexCoord);
-    // Remapping the value from [0,1] to [-1,1] 
-    normalMapSample = 2 * normalMapSample - 1;
-    // Transforming it in the correct tangent space
-    float3 binormal = cross(input.Normal, input.Tangent);
-    float3x3 tangentSpaceAxis = float3x3(input.Tangent, binormal, input.Normal);
-    normalMapSample = mul(normalMapSample, tangentSpaceAxis);
-    //if reading from normal map
-    normal = normalMapSample;
-    
-    float lightDirCos = dot(normal, -gLightDirection);
-    
-    if (lightDirCos >= 0)
+    if (gAreNormalsToggled)
     {
-        // Sampling color from maps
-        float glossinesMapSample = gGlossinessMap.Sample(samplerState, input.TexCoord);
-        float specularMapSample = gSpecularMap.Sample(samplerState, input.TexCoord);
-		// SpecularColor sampled from SpecularMap and PhongExponent from GlossinessMap
-        float3 specular = Phong(specularMapSample, glossinesMapSample * gShininess, input.ViewDirection, normal);
-        float3 cd = gDiffuseMap.Sample(samplerState, input.TexCoord);
-        float3 diffuse = cd * gLightIntensity / gPI;
-        input.Color = lightDirCos * diffuse + specular;
-        return float4(input.Color, 1.f);
+        float3 normalMapSample = gNormalMap.Sample(sampleState, input.TexCoord);
+    // Remapping the value from [0,1] to [-1,1] 
+        normalMapSample = 2 * normalMapSample - 1;
+    // Transforming it in the correct tangent space
+        float3 binormal = cross(input.Normal, input.Tangent);
+        float3x3 tangentSpaceAxis = float3x3(input.Tangent, binormal, input.Normal);
+        normalMapSample = mul(normalMapSample, tangentSpaceAxis);
+    //if reading from normal map
+        normal = normalMapSample;
     }
     
-    return float4(0.f, 0.f, 0.f, 1.f);
-}
-float4 PS_Point(VS_OUTPUT input) : SV_TARGET
+        float lightDirCos = dot(normal, -gLightDirection);
+    
+        if (lightDirCos >= 0)
+        {
+        // Sampling color from maps
+            float glossinesMapSample = gGlossinessMap.Sample(sampleState, input.TexCoord);
+            float specularMapSample = gSpecularMap.Sample(sampleState, input.TexCoord);
+		// SpecularColor sampled from SpecularMap and PhongExponent from GlossinessMap
+            float3 specular = Phong(specularMapSample, glossinesMapSample * gShininess, input.ViewDirection, normal);
+            float3 cd = gDiffuseMap.Sample(sampleState, input.TexCoord);
+            float3 diffuse = cd * gLightIntensity / gPI;
+            input.Color = lightDirCos * diffuse + specular + ambient;
+            return float4(input.Color, 1.f);
+        }
+    
+        return float4(0.f, 0.f, 0.f, 1.f);
+    }
+    float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 {
     return PS(input, samPoint);
 }

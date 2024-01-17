@@ -157,11 +157,8 @@ namespace dae {
 		return out;
 	}
 
-	Matrix Matrix::CreateLookAtLH(const Vector3& origin, const Vector3& forward, const Vector3& up)
+	Matrix Matrix::CreateLookAtLH(const Vector3& origin, const Vector3& forward, const Vector3& right, const Vector3& up)
 	{
-		const Vector3 right = Vector3::Cross(Vector3::UnitY, forward).Normalized();
-		//const Vector3 up2 = Vector3::Cross(forward, right).Normalized();
-
 		return Matrix{
 			Vector4 {right, 0},
 			Vector4 {up, 0},

@@ -22,6 +22,8 @@ namespace dae
 		void Render() const;
 		void ChangeSamplerState();
 		void ToggleRotation();
+		void ToggleNormals();
+		void ToggleFireMesh();
 	private:
 		SDL_Window* m_pWindow{};
 
@@ -29,7 +31,7 @@ namespace dae
 		int m_Height{};
 
 		bool m_IsInitialized{ false };
-
+		bool m_IsFireMeshActive{ true };
 		//DIRECTX
 		HRESULT InitializeDirectX();
 		//...

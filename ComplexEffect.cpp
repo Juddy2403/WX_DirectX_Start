@@ -11,6 +11,13 @@ ComplexEffect::ComplexEffect(ID3D11Device* pDevice, const std::wstring& assetFil
 		std::wcout << L"m_pCameraPos not valid!\n";
 	}
 
+	m_pAreNormalsToggled = m_pEffect->GetVariableByName("gAreNormalsToggled")->AsScalar();
+	if (!m_pAreNormalsToggled->IsValid())
+	{
+		std::wcout << L"m_AreNormalsToggled not valid!\n";
+	}
+	m_pAreNormalsToggled->SetBool(m_NormalsBool);
+
 	m_pWorldMatrix = m_pEffect->GetVariableByName("gWorldMatrix")->AsMatrix();
 	if (!m_pWorldViewProjMatrix->IsValid())
 	{
@@ -43,6 +50,7 @@ ComplexEffect::~ComplexEffect()
 	if (m_pNormalMap) m_pNormalMap->Release();
 	if (m_pGlossinessMap) m_pGlossinessMap->Release();
 	if (m_pSpecularMap) m_pSpecularMap->Release();
+	if (m_pAreNormalsToggled) m_pAreNormalsToggled->Release();
 }
 
 
@@ -54,6 +62,13 @@ void ComplexEffect::SetWorldMatrix(const float* pData)
 void ComplexEffect::SetCameraPos(const float* pData)
 {
 	m_pCameraPos->SetFloatVector(pData);
+}
+
+void ComplexEffect::ToggleNormals()
+{
+	m_NormalsBool = !m_NormalsBool;
+	std::wcout << L"Is normal mapping active: " << std::boolalpha << m_NormalsBool << "\n";
+	m_pAreNormalsToggled->SetBool(m_NormalsBool);
 }
 
 

@@ -158,7 +158,19 @@ void Mesh::SetNormalMap(Texture* pNormalTexture)
 void Mesh::ChangeSamplerState()
 {
 	m_SamplerState = SamplerState((static_cast<int>(m_SamplerState) + 1) % 3);
-	std::wcout<<L"Sampler state changed: " << int(m_SamplerState) << "\n";
+	std::wcout<<L"Current sampler state: ";
+	switch (m_SamplerState)
+	{
+	case SamplerState::point:
+		std::wcout << L"point\n";
+		break;
+	case SamplerState::linear:
+		std::wcout << L"linear\n";
+		break;
+	case SamplerState::anisotropic:
+		std::wcout << L"anisotropic\n";
+		break;
+	}
 }
 
 dae::Matrix Mesh::GetWorldMatrix()
@@ -170,4 +182,9 @@ void Mesh::RotateMesh(const dae::Vector3& rotation)
 {
 	m_WorldMatrix = dae::Matrix::CreateRotation(rotation);
 	UpdateWorldMatrix();
+}
+
+void Mesh::ToggleNormals()
+{
+	if (m_pEffect) static_cast<ComplexEffect*>(m_pEffect)->ToggleNormals();
 }

@@ -33,7 +33,7 @@ namespace dae
 		Matrix viewMatrix{};
 		Matrix projectionMatrix{};
 
-		const float m_Near{ .01f };
+		const float m_Near{ .1f };
 		const float m_Far{ 1000.f };
 		float aspectRatio{};
 		float fov{};
@@ -49,8 +49,7 @@ namespace dae
 
 		void CalculateViewMatrix()
 		{
-			viewMatrix = Matrix::CreateLookAtLH(origin, forward,up);
-
+			viewMatrix = Matrix::CreateLookAtLH(origin, forward,right,up);
 			viewMatrix = viewMatrix.Inverse();
 		}
 
@@ -73,8 +72,11 @@ namespace dae
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 
-			const float movementSpeed{ 10.f }, rotationSpeed{ 50.f };
+			const float rotationSpeed{ 40.f };
+			float movementSpeed{};
 
+			if (pKeyboardState[SDL_SCANCODE_LSHIFT]) movementSpeed = 12.f;
+			else movementSpeed = 6.f;
 			if (pKeyboardState[SDL_SCANCODE_W]) origin += (movementSpeed * deltaTime) * forward.Normalized();
 			if (pKeyboardState[SDL_SCANCODE_S]) origin -= (movementSpeed * deltaTime) * forward.Normalized();
 			if (pKeyboardState[SDL_SCANCODE_A]) origin -= (movementSpeed * deltaTime) * right.Normalized();
@@ -98,7 +100,8 @@ namespace dae
 
 			forward = finalRotation.TransformVector(Vector3::UnitZ);
 			forward.Normalize();
-
+			right = Vector3::Cross(Vector3::UnitY, forward).Normalized();
+			up = Vector3::Cross(forward, right).Normalized();
 			//Update Matrices
 			CalculateViewMatrix();
 		}

@@ -39,6 +39,7 @@ public:
 	void ChangeSamplerState();
 	dae::Matrix GetWorldMatrix();
 	void RotateMesh(const dae::Vector3& rotation);
+	void ToggleNormals();
 private:
 	void UpdateWorldMatrix();
 
